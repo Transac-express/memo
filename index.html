@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Mémo Agenda</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mémo Agenda">
+<meta name="theme-color" content="#4c3ad2">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEwUlEQVR42u2dz04TURSH7zQ+jsWlgugCohtKa6Jv4FKMrpSWwgIQdKfga5gAxY0UE/lXceW/pe+CC4hxwZ3O0DN35p7zfekOmJme+/Wc352SNnk8+ccBXMY1586oAlxKjRIAcgBygGDmSMgc4A2kCUUAxgogBwhmDgBf5iCQAmMF2K0AnQOCBFIyB9A5ADkAOSBA5mC3At6tLIEUGCuAHIAcECKQkjnAG0jZrQBjBZADJDMHgC9zEEiBsQLsVoDOAUECKZkD6ByAHIAcECBzsFsB71aWQAp+Oazzfv+670dz078tVyZ5MvULJ4Zi0xKLcuTSwrIiydzUTzvPdnO/PvpBnk5beTnVXOKMPETMuDDMRsWs3OfY7Ncre7QKdw7MwA+fHOq7Y3GruNmv6y5dzbkzxY+Ngl/fG/264uppHisb/TE1ZynpDinvrQjcECCQxtU29sZUnito5+A/wYR6h8Iy6uwc7/ZuqD8jcgByQDVn5bN735U9pbefSuvwz+//0LWVJZBKoqqYjBVADkAOkMwc3ASTjPe6isl7K8J2MFaAzAHmMwcwVXyZg0AqCTfBwMhYYbfCXKFzwFUCKZlDsHGQOcAGyAHIAVfJHOxWBDOHrmJyE0wWAimQOQA5AHyBlMwhGEj5TzBIsYOxAmQOMJ85gKniyxwEUkm4CQZGxgq7FeaKoc7xYuabqfMWGkjJHFJdQ1slyRxgTI6XM6fqzxhmKxsBbz7ejHdJ4r34WpK46j+8Y97/J/ONcKWfb5zKXnxFHrHfBDuL+TKqXnnNgXS+8VXNWZAjvpVTbEY0cvjW4PXurRLXL8uRfVcYhVXR3wTLcv3txmB9d1z2vO3GICn4sivQOWL5Til/mbM82rMDSTNmB2Eum2+HHIn13niOFZUyQ/rayByBliT9IKMcZ8Q/F9c0QOaInvXeeCdPuc9/eS3Py/r8T3LVKuX4sdQ8aTeOI/JgrTfhX78T3ccsoXOo2ZSv9SauVnfx1UoxI7bMEdX34HaaJ+kbxEpvrJzrNE/4LvuSmsfOBNcgmTk6s0fRXfSrndvpv7DQPOaqDG1lc1V56DphhtrOkd2AAEtSkcugc+SueNEtRLEZzrlkoXnkYmZ1O+vyd1vHUZ+0FDkOYw/Vq9uT2X+52zqK5VzIUYIfudavuCMjRwR+FIECM5ymfxOsznroMMM5l3SbB04XK9t3yjr1YutQUyWTbkubHBeKbAVVZPHBob4aqpUjmCIqtTAhR6GKKNbiQo5FA3L8Y1nCkiXtTvwvxxdnleWtu9lsOLBZH9NyDLXErBbn8Jlg6a8d08+eT/YBf+fgM8FSG4fp4tA5ADkAOUA0c7BbSckctovDB+OnQyAFQA5ADpAKpGSOlEBquzi8tzLEDsYKAHJAzswBTBVf5iCQpmE8kCpi6cNUFQ64/PAzuxVQPo0IpJAWSMkc4o1DSUnpHIAcgBwgmjnYrYhnDi0lTVYe7bGcwFgB5ADkgOIDKTfBwCcH760AYwWQA0QzB4AvcxBIgbEC7FaAzgFBAimZA+gcgByAHBAgc7BbAe9WlkAKjBVADkAOCBFIyRzgDaTsVoCxAsgBkpkDwJc5CKTAWAF2K0DngCCBlMwBdA5ADkAOKJy/QxOtU5SxrnkAAAAASUVORK5CYII=">
+<style>
+  :root{
+    --bg:#0e0d1a; --card:#1a1830; --card2:#232043; --txt:#f2f0ff; --muted:#9a94c2;
+    --accent:#7c5cff; --accent2:#4c3ad2; --ok:#2dd4a0; --warn:#ffb84d; --danger:#ff5c7a;
+    --radius:18px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    height:100%; overscroll-behavior:none;}
+  body{display:flex;flex-direction:column;min-height:100dvh;}
+  header{padding:calc(env(safe-area-inset-top) + 14px) 20px 10px;display:flex;align-items:center;justify-content:space-between;}
+  header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.3px;}
+  header h1 span{color:var(--accent);}
+  #main{flex:1;overflow-y:auto;padding:8px 16px 90px;}
+  .hidden{display:none !important;}
+
+  /* ---- Onglets bas ---- */
+  nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(20,18,40,.96);
+    backdrop-filter:blur(12px);border-top:1px solid #2c2950;
+    padding-bottom:env(safe-area-inset-bottom);z-index:50;}
+  nav button{flex:1;background:none;border:none;color:var(--muted);font-size:11px;
+    padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
+  nav button .ico{font-size:21px;}
+  nav button.active{color:var(--accent);}
+
+  /* ---- Bouton micro ---- */
+  .talk-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:26px;}
+  .hint{color:var(--muted);text-align:center;font-size:14px;max-width:290px;line-height:1.45;}
+  #micBtn{width:150px;height:150px;border-radius:50%;border:none;cursor:pointer;
+    background:radial-gradient(circle at 30% 25%,var(--accent),var(--accent2));
+    color:#fff;font-size:54px;box-shadow:0 10px 40px rgba(124,92,255,.45);
+    transition:transform .15s;}
+  #micBtn:active{transform:scale(.94);}
+  #micBtn.listening{animation:pulse 1.1s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,92,255,.55);}70%{box-shadow:0 0 0 34px rgba(124,92,255,0);}100%{box-shadow:0 0 0 0 rgba(124,92,255,0);}}
+  #liveTxt{min-height:44px;color:var(--txt);text-align:center;font-size:16px;padding:0 8px;font-style:italic;}
+  .linkish{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;text-decoration:underline;}
+
+  /* ---- Cartes ---- */
+  .card{background:var(--card);border:1px solid #2c2950;border-radius:var(--radius);padding:18px;margin:14px 0;}
+  .card h3{margin:0 0 12px;font-size:16px;}
+  label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px;}
+  input,select,textarea{width:100%;background:var(--card2);border:1px solid #37326b;color:var(--txt);
+    border-radius:12px;padding:12px;font-size:16px;outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  .btnrow{display:flex;gap:10px;margin-top:18px;}
+  .btn{flex:1;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+  .btn.ghost{background:var(--card2);color:var(--txt);border:1px solid #37326b;}
+  .btn.danger{background:var(--danger);color:#fff;}
+  .btn.okk{background:var(--ok);color:#06281d;}
+  .tag{display:inline-block;background:var(--card2);border-radius:8px;padding:3px 9px;font-size:12px;color:var(--muted);margin-right:6px;}
+
+  .evt{display:flex;align-items:center;gap:10px;background:var(--card2);border-radius:12px;padding:11px 12px;margin:8px 0;}
+  .evt .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none;}
+  .evt .info{flex:1;min-width:0;}
+  .evt .t{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .evt .d{font-size:12px;color:var(--muted);}
+  .evt .del{background:none;border:none;color:var(--danger);font-size:19px;cursor:pointer;padding:4px;}
+
+  .banner{border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.4;margin:12px 0;}
+  .banner.warn{background:#3a2c10;border:1px solid #7a5c1e;color:#ffd990;}
+  .banner.err{background:#3a1020;border:1px solid #7a1e3a;color:#ffb0c0;}
+  .banner.ok{background:#0f3328;border:1px solid #1e7a5c;color:#a9f5dc;}
+  .banner.info{background:#141c3a;border:1px solid #2c3e7a;color:#b9c8ff;}
+
+  /* ---- Calendrier ---- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px;}
+  .cal-head b{font-size:17px;text-transform:capitalize;}
+  .cal-head button{background:var(--card2);border:1px solid #37326b;color:var(--txt);border-radius:10px;
+    width:38px;height:38px;font-size:17px;cursor:pointer;}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .dow{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;}
+  .day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:10px;font-size:14px;cursor:pointer;position:relative;border:1px solid transparent;}
+  .day.other{color:#4d4880;}
+  .day.today{border-color:var(--accent);}
+  .day.sel{background:var(--accent2);}
+  .day .dots{display:flex;gap:2px;height:5px;margin-top:2px;}
+  .day .dots i{width:5px;height:5px;border-radius:50%;background:var(--ok);}
+  .spin{margin:26px auto;border:3px solid #37326b;border-top-color:var(--accent);border-radius:50%;
+    width:34px;height:34px;animation:rot 0.8s linear infinite;}
+  @keyframes rot{to{transform:rotate(360deg);}}
+  .center{text-align:center;color:var(--muted);font-size:14px;padding:14px 6px;}
+  .big-emoji{font-size:44px;text-align:center;margin:6px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎙️ Mémo <span>Agenda</span></h1>
+  <button class="linkish" style="text-decoration:none;font-size:22px" onclick="showTab('reglages')">⚙️</button>
+</header>
+
+<div id="main">
+
+  <!-- ============ ONGLET PARLER ============ -->
+  <section id="tab-parler">
+    <div id="setupBanner" class="banner warn hidden">
+      ⚠️ L'app n'est pas encore reliée à ton agenda. Va dans <b>Réglages</b> et colle l'adresse du webhook n8n.
+    </div>
+
+    <!-- état : repos / écoute -->
+    <div id="stIdle" class="talk-wrap">
+      <p class="hint">Appuie sur le bouton et dis-moi ce que tu as prévu.<br>
+      <i>« Apéro avec Jean-Claude mercredi 3 juin à 19h »</i></p>
+      <button id="micBtn" onclick="toggleMic()">🎤</button>
+      <div id="liveTxt"></div>
+      <button class="linkish" onclick="openManual()">✍️ Écrire à la place</button>
+    </div>
+
+    <!-- état : saisie manuelle -->
+    <div id="stManual" class="card hidden">
+      <h3>✍️ Écris ton mémo</h3>
+      <textarea id="manualTxt" rows="3" placeholder="Ex : dîner avec Sophie vendredi 12 à 20h"></textarea>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="backToIdle()">Annuler</button>
+        <button class="btn primary" onclick="parseManual()">Analyser</button>
+      </div>
+    </div>
+
+    <!-- état : validation (TOUJOURS avant enregistrement) -->
+    <div id="stReview" class="card hidden">
+      <h3>🧐 Vérifie avant que je l'enregistre</h3>
+      <div id="parseWarn"></div>
+      <label>Quoi ?</label>
+      <input id="fTitle" type="text" placeholder="Titre de l'événement">
+      <label>Quel jour ?</label>
+      <input id="fDate" type="date">
+      <label>À quelle heure ?</label>
+      <input id="fTime" type="time">
+      <label>Durée</label>
+      <select id="fDur">
+        <option value="30">30 min</option>
+        <option value="60">1 h</option>
+        <option value="90">1 h 30</option>
+        <option value="120" selected>2 h</option>
+        <option value="180">3 h</option>
+        <option value="240">4 h</option>
+      </select>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="backToIdle()">❌ Annuler</button>
+        <button class="btn primary" onclick="validateAndCheck()">✅ Valider</button>
+      </div>
+    </div>
+
+    <!-- état : vérification -->
+    <div id="stChecking" class="hidden">
+      <div class="spin"></div>
+      <p class="center">Je vérifie ton agenda…</p>
+    </div>
+
+    <!-- état : conflit dur (chevauchement) -->
+    <div id="stBlocked" class="card hidden">
+      <div class="big-emoji">🚫</div>
+      <h3 style="text-align:center">Non, tu as déjà un truc à cette heure-là !</h3>
+      <div id="blockedList"></div>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="backToIdle()">Abandonner</button>
+        <button class="btn primary" onclick="backToReview()">Changer l'heure</button>
+      </div>
+    </div>
+
+    <!-- état : avertissement (même jour, heures différentes) -->
+    <div id="stWarn" class="card hidden">
+      <div class="big-emoji">⚠️</div>
+      <h3 style="text-align:center">Attention, ce jour-là tu as déjà :</h3>
+      <div id="warnList"></div>
+      <p class="center">Ton nouveau créneau ne se chevauche pas.<br>On ajoute quand même ?</p>
+      <div class="btnrow">
+        <button class="btn ghost" onclick="backToReview()">Non, je change</button>
+        <button class="btn okk" onclick="saveEvent()">Oui, ajouter</button>
+      </div>
+    </div>
+
+    <!-- état : enregistré -->
+    <div id="stSaved" class="card hidden">
+      <div class="big-emoji">✅</div>
+      <h3 style="text-align:center">C'est calé !</h3>
+      <div id="savedRecap" class="center" style="color:var(--txt);font-size:16px"></div>
+      <div class="banner info">🔔 Rappels prévus : <b>7 jours avant</b>, <b>3 jours avant</b> et <b>2 h avant</b> (notifications via Google Agenda).</div>
+      <div class="btnrow">
+        <button class="btn primary" onclick="backToIdle()">🎤 Nouveau mémo</button>
+      </div>
+    </div>
+
+    <div id="stError" class="banner err hidden"></div>
+  </section>
+
+  <!-- ============ ONGLET CALENDRIER ============ -->
+  <section id="tab-calendrier" class="hidden">
+    <div class="cal-head">
+      <button onclick="calMove(-1)">‹</button>
+      <b id="calTitle"></b>
+      <button onclick="calMove(1)">›</button>
+    </div>
+    <div class="grid" id="calDow"></div>
+    <div class="grid" id="calGrid"></div>
+    <div id="calLoading" class="hidden"><div class="spin"></div></div>
+    <div id="dayPanel"></div>
+  </section>
+
+  <!-- ============ ONGLET HISTORIQUE ============ -->
+  <section id="tab-historique" class="hidden">
+    <h3 style="margin:10px 4px">🕘 Tout ce que tu m'as dicté</h3>
+    <div id="histList"></div>
+  </section>
+
+  <!-- ============ ONGLET RÉGLAGES ============ -->
+  <section id="tab-reglages" class="hidden">
+    <div class="card">
+      <h3>⚙️ Connexion à ton agenda</h3>
+      <label>Adresse du webhook n8n (URL de production)</label>
+      <input id="whUrl" type="url" placeholder="https://ton-espace.app.n8n.cloud/webhook/memo-agenda">
+      <div class="btnrow">
+        <button class="btn primary" onclick="saveSettings()">Enregistrer</button>
+        <button class="btn ghost" onclick="testWebhook()">Tester</button>
+      </div>
+      <div id="testResult"></div>
+    </div>
+    <div class="card">
+      <h3>💡 Rappels</h3>
+      <p style="color:var(--muted);font-size:14px;line-height:1.5;margin:0">
+        Chaque événement créé ici reçoit automatiquement 3 rappels : 7 jours avant, 3 jours avant et 2 h avant.
+        Pour recevoir les notifications sur ton iPhone, installe l'app <b>Google Agenda</b> et autorise ses notifications.</p>
+    </div>
+  </section>
+</div>
+
+<nav>
+  <button id="nav-parler" class="active" onclick="showTab('parler')"><span class="ico">🎤</span>Parler</button>
+  <button id="nav-calendrier" onclick="showTab('calendrier')"><span class="ico">📅</span>Calendrier</button>
+  <button id="nav-historique" onclick="showTab('historique')"><span class="ico">🕘</span>Historique</button>
+  <button id="nav-reglages" onclick="showTab('reglages')"><span class="ico">⚙️</span>Réglages</button>
+</nav>
+
+<script>
+/* ================== ÉTAT GLOBAL ================== */
+const LS = { url:'mva_webhook', hist:'mva_history' };
+let pending = null;      // événement en cours de validation {title,start,end,transcript}
+let dayEventsCache = {}; // clé YYYY-MM => events[]
+let calCur = new Date(); calCur.setDate(1);
+let selDay = null;
+let recog = null, listening = false, finalTxt = '';
+
+/* ================== OUTILS ================== */
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+function isoLocal(d){
+  const off = -d.getTimezoneOffset(), s = off>=0?'+':'-';
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00${s}${pad(Math.floor(Math.abs(off)/60))}:${pad(Math.abs(off)%60)}`;
+}
+function fmtDate(d){ return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long'}).format(d); }
+function fmtTime(d){ return pad(d.getHours())+'h'+(d.getMinutes()? pad(d.getMinutes()):''); }
+function esc(s){ const e=document.createElement('span'); e.textContent=s||''; return e.innerHTML; }
+function getHist(){ try{return JSON.parse(localStorage.getItem(LS.hist)||'[]');}catch(e){return [];} }
+function setHist(h){ localStorage.setItem(LS.hist, JSON.stringify(h)); }
+
+async function api(body){
+  const url = localStorage.getItem(LS.url);
+  if(!url) throw new Error('NO_URL');
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const txt = await r.text();
+  try{ return JSON.parse(txt); }catch(e){ return txt; }
+}
+function normEvents(res){
+  const arr = Array.isArray(res)? res : [res];
+  return arr.filter(e => e && e.id && e.status!=='cancelled').map(e => ({
+    id: e.id,
+    title: e.summary || '(sans titre)',
+    allDay: !!(e.start && e.start.date),
+    start: new Date(e.start && (e.start.dateTime || e.start.date)),
+    end:   new Date(e.end   && (e.end.dateTime   || e.end.date))
+  }));
+}
+async function listRange(from, to){
+  const res = await api({action:'list', timeMin: from.toISOString(), timeMax: to.toISOString()});
+  return normEvents(res);
+}
+
+/* ================== NAVIGATION ================== */
+function showTab(t){
+  ['parler','calendrier','historique','reglages'].forEach(x=>{
+    $('tab-'+x).classList.toggle('hidden', x!==t);
+    $('nav-'+x).classList.toggle('active', x===t);
+  });
+  if(t==='calendrier') renderCal(true);
+  if(t==='historique') renderHist();
+  if(t==='reglages') $('whUrl').value = localStorage.getItem(LS.url)||'';
+  if(t==='parler') refreshSetupBanner();
+}
+function refreshSetupBanner(){
+  $('setupBanner').classList.toggle('hidden', !!localStorage.getItem(LS.url));
+}
+function showState(st){
+  ['stIdle','stManual','stReview','stChecking','stBlocked','stWarn','stSaved'].forEach(x=>$(x).classList.add('hidden'));
+  $('stError').classList.add('hidden');
+  $(st).classList.remove('hidden');
+}
+function backToIdle(){ pending=null; $('liveTxt').textContent=''; showState('stIdle'); }
+function backToReview(){ showState('stReview'); }
+function showError(msg){ $('stError').textContent = msg; $('stError').classList.remove('hidden'); }
+
+/* ================== DICTÉE ================== */
+function toggleMic(){
+  if(listening){ if(recog) recog.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ openManual(); $('manualTxt').placeholder='La dictée directe n\'est pas dispo sur ce navigateur — utilise le micro 🎤 de ton clavier ici.'; return; }
+  recog = new SR();
+  recog.lang='fr-FR'; recog.interimResults=true; recog.continuous=false; recog.maxAlternatives=1;
+  finalTxt='';
+  recog.onresult = ev => {
+    let interim='';
+    for(let i=ev.resultIndex;i<ev.results.length;i++){
+      if(ev.results[i].isFinal) finalTxt += ev.results[i][0].transcript;
+      else interim += ev.results[i][0].transcript;
+    }
+    $('liveTxt').textContent = '« '+(finalTxt+interim).trim()+' »';
+  };
+  recog.onerror = e => { stopUI(); if(e.error!=='aborted' && e.error!=='no-speech') showError('Micro indisponible ('+e.error+'). Utilise « Écrire à la place ».'); };
+  recog.onend = () => {
+    stopUI();
+    const t = finalTxt.trim();
+    if(t) startReview(t);
+  };
+  listening=true; $('micBtn').classList.add('listening'); $('micBtn').textContent='⏹';
+  $('liveTxt').textContent='Je t\'écoute…';
+  recog.start();
+}
+function stopUI(){ listening=false; $('micBtn').classList.remove('listening'); $('micBtn').textContent='🎤'; }
+function openManual(){ showState('stManual'); $('manualTxt').value=''; setTimeout(()=>$('manualTxt').focus(),100); }
+function parseManual(){ const t=$('manualTxt').value.trim(); if(t) startReview(t); }
+
+/* ================== ANALYSE DU FRANÇAIS ================== */
+const MOIS = {janvier:0,fevrier:1,mars:2,avril:3,mai:4,juin:5,juillet:6,aout:7,septembre:8,octobre:9,novembre:10,decembre:11};
+const JOURS = {dimanche:0,lundi:1,mardi:2,mercredi:3,jeudi:4,vendredi:5,samedi:6};
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+
+function parseMemo(text){
+  const t = norm(text);
+  const now = new Date();
+  let date=null, hour=null, min=0, hasTime=false, moment=null;
+
+  // 1) date explicite : (le) (mercredi) 3 juin (2026)
+  let m = t.match(/(?:le\s+)?(?:(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)\s+)?(1er|\d{1,2})\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)(?:\s+(\d{4}))?/);
+  if(m){
+    const day = m[2]==='1er'?1:parseInt(m[2],10);
+    const mon = MOIS[m[3]];
+    let year = m[4]? parseInt(m[4],10) : now.getFullYear();
+    date = new Date(year, mon, day);
+    if(!m[4] && date < new Date(now.getFullYear(),now.getMonth(),now.getDate())) date.setFullYear(year+1);
+  }
+  // 1b) "vendredi 12" (jour de semaine + numéro, sans mois)
+  if(!date){
+    m = t.match(/\b(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)\s+(\d{1,2})\b(?!\s*(?:h\b|heures?\b|janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre))/);
+    if(m){
+      const wd=JOURS[m[1]], num=parseInt(m[2],10);
+      let exact=null;
+      for(let i=1;i<=400;i++){
+        const c=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);
+        if(c.getDate()===num && c.getDay()===wd){ exact=c; break; }
+      }
+      const fb=new Date(now.getFullYear(),now.getMonth(),num);
+      if(fb<=now) fb.setMonth(fb.getMonth()+1);
+      // si la combinaison exacte jour+numéro est à plus de 2 mois, l'utilisateur s'est
+      // probablement trompé de jour de semaine : on privilégie le numéro du jour.
+      date = (exact && (exact-now) < 62*86400000) ? exact : fb;
+    }
+  }
+  // 1c) "le 12" seul (numéro de jour sans mois)
+  if(!date){
+    m = t.match(/\ble\s+(\d{1,2})\b(?!\s*(?:h\b|heures?\b|janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre))/);
+    if(m){
+      const num=parseInt(m[1],10);
+      const c=new Date(now.getFullYear(),now.getMonth(),num);
+      if(c<=now) c.setMonth(c.getMonth()+1);
+      date=c;
+    }
+  }
+  // 2) relatif
+  if(!date){
+    if(/apres[- ]demain/.test(t)){ date=new Date(now); date.setDate(date.getDate()+2); }
+    else if(/\bdemain\b/.test(t)){ date=new Date(now); date.setDate(date.getDate()+1); }
+    else if(/aujourd|ce soir|ce midi|ce matin|cet apres[- ]midi|cette apres[- ]midi/.test(t)){ date=new Date(now); }
+  }
+  // 3) "dans X jours / semaines"
+  if(!date){
+    m = t.match(/dans\s+(\d+)\s+(jour|semaine)/);
+    if(m){ date=new Date(now); date.setDate(date.getDate() + parseInt(m[1],10)*(m[2].startsWith('semaine')?7:1)); }
+  }
+  // 4) jour de la semaine seul
+  if(!date){
+    m = t.match(/\b(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)(\s+prochain)?\b/);
+    if(m){
+      date=new Date(now);
+      let diff = (JOURS[m[1]] - date.getDay() + 7) % 7;
+      if(diff===0) diff = 7;
+      if(m[2]) diff = diff===7 ? 7 : diff + (diff < 7 ? 0 : 0); // "prochain" = prochaine occurrence
+      date.setDate(date.getDate()+diff);
+    }
+  }
+
+  // heure : "à 19h30", "19 h", "vers 20 heures 15"
+  m = t.match(/(?:a|vers)\s+(\d{1,2})\s*(?:h|heures?)\s*(\d{2})?/) || t.match(/\b(\d{1,2})\s*h\s*(\d{2})?\b/);
+  if(m){ hour=parseInt(m[1],10); min=m[2]?parseInt(m[2],10):0; if(hour<24) hasTime=true; }
+  if(!hasTime && /\bmidi\b/.test(t)){ hour=12; min=0; hasTime=true; }
+  if(!hasTime && /\bminuit\b/.test(t)){ hour=23; min=30; hasTime=true; }
+
+  // moment de la journée
+  if(/\bsoir(ee)?\b/.test(t)) moment='soir';
+  else if(/apres[- ]midi|aprem/.test(t)) moment='apres-midi';
+  else if(/\bmatin(ee)?\b/.test(t)) moment='matin';
+  else if(/dejeuner/.test(t)) moment='midi';
+  if(!hasTime && moment){
+    hour = {matin:9, midi:12, 'apres-midi':15, soir:19}[moment]; min=0;
+  }
+
+  // titre
+  const ACT = [
+    ['boire un verre','🍻 Verre'],['apero','🍻 Apéro'],['soiree','🎉 Soirée'],['diner','🍽️ Dîner'],
+    ['dejeuner','🍽️ Déjeuner'],['brunch','🥐 Brunch'],['cafe','☕ Café'],['restaurant','🍽️ Restaurant'],
+    ['resto','🍽️ Resto'],['rendez-vous','📌 Rendez-vous'],['rdv','📌 RDV'],['reunion','💼 Réunion'],
+    ['concert','🎵 Concert'],['cinema','🎬 Cinéma'],['cine','🎬 Ciné'],['match','⚽ Match'],
+    ['anniversaire','🎂 Anniversaire'],['fete','🎉 Fête'],['medecin','🩺 Médecin'],['dentiste','🦷 Dentiste'],
+    ['coiffeur','💈 Coiffeur'],['sport','🏋️ Sport'],['footing','🏃 Footing'],['courses','🛒 Courses']
+  ];
+  let title=null;
+  for(const [k,label] of ACT){ if(t.includes(k)){ title=label; break; } }
+  m = text.match(/(?:avec|chez|crois[ée]?)\s+([A-ZÀ-Ý][\wà-ÿ'-]+(?:\s+[A-ZÀ-Ý][\wà-ÿ'-]+)?)/);
+  if(!m) { const mm = norm(text).match(/(?:avec|chez)\s+([a-zà-ÿ'-]{2,}(?:\s[a-zà-ÿ'-]{2,})?)/); if(mm) m=[null, mm[1].replace(/\b\w/g,c=>c.toUpperCase())]; }
+  let person = m ? m[1].trim() : null;
+  if(person){
+    const STOP=['le','la','les','l','un','une','des','mon','ma','mes','ton','ta','tes','son','sa','ses','ce','cette','ces','du','de','d','quelqu','quelqu\'un','lui','elle','eux','moi','toi','dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi','demain','midi','soir','matin'];
+    const words = person.split(/\s+/);
+    if(STOP.includes(norm(words[0]))) person = null;
+    else if(words[1] && STOP.includes(norm(words[1]))) person = words[0];
+  }
+  if(title && person) title += ' avec '+person;
+  else if(!title && person) title = 'Avec '+person;
+  if(!title){
+    let cleaned = text.replace(/aujourd'?hui|j'ai crois[ée]?[^,\.]*(?:il|elle) m'a propos[ée]? (?:de|d')?/gi,'')
+                      .replace(/(?:le\s+)?(dimanche|lundi|mardi|mercredi|jeudi|vendredi|samedi)?\s*(1er|\d{1,2})\s+(janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre)(\s+\d{4})?/gi,'')
+                      .replace(/(?:a|à|vers)\s+\d{1,2}\s*(?:h|heures?)\s*(\d{2})?/gi,'')
+                      .replace(/\s+/g,' ').trim();
+    title = cleaned ? cleaned.charAt(0).toUpperCase()+cleaned.slice(1,60) : 'Événement';
+  }
+  return { title, date, hour, min, hasTime: hasTime || !!moment, moment, transcript: text };
+}
+
+function startReview(text){
+  const p = parseMemo(text);
+  pending = p;
+  $('fTitle').value = p.title;
+  $('fDate').value  = p.date ? `${p.date.getFullYear()}-${pad(p.date.getMonth()+1)}-${pad(p.date.getDate())}` : '';
+  $('fTime').value  = (p.hour!==null && p.hour!==undefined) ? `${pad(p.hour)}:${pad(p.min)}` : '';
+  $('parseWarn').innerHTML = '';
+  const warns=[];
+  if(!p.date) warns.push('Je n\'ai pas compris <b>la date</b> — choisis-la ci-dessous.');
+  if(p.hour===null || p.hour===undefined) warns.push('Je n\'ai pas compris <b>l\'heure</b> — indique-la ci-dessous.');
+  if(warns.length) $('parseWarn').innerHTML = `<div class="banner warn">${warns.join('<br>')}</div>`;
+  $('parseWarn').innerHTML += `<div class="tag">🗣 « ${esc(text.length>90?text.slice(0,90)+'…':text)} »</div>`;
+  showState('stReview');
+}
+
+/* ================== VALIDATION + CONFLITS ================== */
+async function validateAndCheck(){
+  const title = $('fTitle').value.trim();
+  const dv = $('fDate').value, tv = $('fTime').value;
+  if(!title || !dv || !tv){ alert('Il me faut un titre, une date et une heure !'); return; }
+  if(!localStorage.getItem(LS.url)){ showTab('reglages'); return; }
+  const [Y,Mo,D] = dv.split('-').map(Number);
+  const [H,Mi]   = tv.split(':').map(Number);
+  const start = new Date(Y,Mo-1,D,H,Mi);
+  const end   = new Date(start.getTime() + parseInt($('fDur').value,10)*60000);
+  pending = Object.assign(pending||{}, { title, start, end });
+
+  showState('stChecking');
+  try{
+    const d0=new Date(Y,Mo-1,D,0,0,0), d1=new Date(Y,Mo-1,D,23,59,59);
+    const evts = await listRange(d0,d1);
+    const overlap = evts.filter(e => !e.allDay && e.start < end && e.end > start);
+    const sameDay = evts.filter(e => !overlap.includes(e));
+    if(overlap.length){
+      $('blockedList').innerHTML = overlap.map(e=>evtHTML(e,false)).join('');
+      showState('stBlocked');
+    } else if(sameDay.length){
+      $('warnList').innerHTML = sameDay.map(e=>evtHTML(e,false)).join('');
+      showState('stWarn');
+    } else {
+      await saveEvent();
+    }
+  }catch(err){
+    showState('stReview');
+    showError('Impossible de joindre ton agenda ('+err.message+'). Vérifie le webhook dans Réglages et ta connexion internet.');
+  }
+}
+
+async function saveEvent(){
+  showState('stChecking');
+  try{
+    const res = await api({
+      action:'create',
+      title: pending.title,
+      start: isoLocal(pending.start),
+      end:   isoLocal(pending.end),
+      notes: '🎙️ Dicté le '+new Date().toLocaleDateString('fr-FR')+(pending.transcript? ' — « '+pending.transcript+' »':'')
+    });
+    const created = (Array.isArray(res)?res[0]:res) || {};
+    const h = getHist();
+    h.unshift({
+      id: 'h'+Date.now(),
+      transcript: pending.transcript||'',
+      title: pending.title,
+      start: pending.start.toISOString(),
+      end: pending.end.toISOString(),
+      eventId: created.id || null,
+      createdAt: new Date().toISOString()
+    });
+    setHist(h);
+    dayEventsCache = {}; // invalider le cache calendrier
+    $('savedRecap').innerHTML = `<b>${esc(pending.title)}</b><br>${fmtDate(pending.start)} · ${fmtTime(pending.start)} → ${fmtTime(pending.end)}`;
+    showState('stSaved');
+  }catch(err){
+    showState('stReview');
+    showError('Échec de l\'enregistrement ('+err.message+'). Réessaie.');
+  }
+}
+
+function evtHTML(e, withDel){
+  const when = e.allDay ? 'Toute la journée' : fmtTime(e.start)+' → '+fmtTime(e.end);
+  return `<div class="evt"><span class="dot"></span>
+    <div class="info"><div class="t">${esc(e.title)}</div><div class="d">${when}</div></div>
+    ${withDel?`<button class="del" onclick="deleteEvt('${e.id}', this)">🗑</button>`:''}</div>`;
+}
+
+/* ================== SUPPRESSION (app + Google) ================== */
+async function deleteEvt(eventId, btn){
+  if(!confirm('Supprimer cet événement ? Il sera aussi retiré de ton agenda Google.')) return;
+  if(btn) btn.textContent='⏳';
+  try{
+    await api({action:'delete', eventId});
+    const h = getHist().filter(x=>x.eventId!==eventId); setHist(h);
+    dayEventsCache = {};
+    renderCal(true); renderHist();
+  }catch(err){
+    alert('Suppression impossible : '+err.message);
+    if(btn) btn.textContent='🗑';
+  }
+}
+
+/* ================== CALENDRIER ================== */
+function calKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1); }
+function calMove(n){ calCur.setMonth(calCur.getMonth()+n); selDay=null; $('dayPanel').innerHTML=''; renderCal(false); }
+
+async function renderCal(force){
+  $('calTitle').textContent = new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(calCur);
+  $('calDow').innerHTML = ['L','M','M','J','V','S','D'].map(x=>`<div class="dow">${x}</div>`).join('');
+  const key = calKey(calCur);
+  let evts = dayEventsCache[key];
+  if(!evts && localStorage.getItem(LS.url)){
+    $('calLoading').classList.remove('hidden');
+    try{
+      const from = new Date(calCur.getFullYear(), calCur.getMonth()-0, 1); from.setDate(from.getDate()-7);
+      const to   = new Date(calCur.getFullYear(), calCur.getMonth()+1, 7);
+      evts = await listRange(from,to);
+      dayEventsCache[key]=evts;
+    }catch(e){ evts=[]; }
+    $('calLoading').classList.add('hidden');
+  }
+  evts = evts||[];
+  const byDay = {};
+  evts.forEach(e=>{ const k=e.start.getFullYear()+'-'+pad(e.start.getMonth()+1)+'-'+pad(e.start.getDate()); (byDay[k]=byDay[k]||[]).push(e); });
+
+  const first = new Date(calCur.getFullYear(), calCur.getMonth(), 1);
+  let startIdx = (first.getDay()+6)%7; // lundi=0
+  const daysInMonth = new Date(calCur.getFullYear(), calCur.getMonth()+1, 0).getDate();
+  const today = new Date();
+  let html='';
+  for(let i=0;i<startIdx;i++) html+='<div class="day other"></div>';
+  for(let d=1; d<=daysInMonth; d++){
+    const dt = new Date(calCur.getFullYear(), calCur.getMonth(), d);
+    const k  = dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(d);
+    const isToday = dt.toDateString()===today.toDateString();
+    const evs = byDay[k]||[];
+    html += `<div class="day ${isToday?'today':''} ${selDay===k?'sel':''}" onclick="pickDay('${k}')">${d}
+      <span class="dots">${evs.slice(0,3).map(()=>'<i></i>').join('')}</span></div>`;
+  }
+  $('calGrid').innerHTML = html;
+  window._byDay = byDay;
+  if(selDay) showDay(selDay);
+}
+function pickDay(k){ selDay=k; renderCal(false); showDay(k); }
+function showDay(k){
+  const evs = (window._byDay||{})[k]||[];
+  const [Y,Mo,D]=k.split('-').map(Number);
+  const dt=new Date(Y,Mo-1,D);
+  $('dayPanel').innerHTML = `<div class="card"><h3 style="text-transform:capitalize">${fmtDate(dt)}</h3>`+
+    (evs.length? evs.map(e=>evtHTML(e,true)).join('') : '<p class="center">Rien de prévu ce jour-là 👌</p>')+`</div>`;
+}
+
+/* ================== HISTORIQUE ================== */
+function renderHist(){
+  const h = getHist();
+  if(!h.length){ $('histList').innerHTML='<p class="center">Aucun mémo pour l\'instant.<br>Appuie sur 🎤 pour commencer !</p>'; return; }
+  $('histList').innerHTML = h.map(x=>{
+    const s=new Date(x.start);
+    return `<div class="evt"><span class="dot"></span>
+      <div class="info">
+        <div class="t">${esc(x.title)}</div>
+        <div class="d">${fmtDate(s)} · ${fmtTime(s)}</div>
+        ${x.transcript?`<div class="d" style="font-style:italic">🗣 « ${esc(x.transcript.length>70?x.transcript.slice(0,70)+'…':x.transcript)} »</div>`:''}
+      </div>
+      ${x.eventId?`<button class="del" onclick="deleteEvt('${x.eventId}', this)">🗑</button>`
+                 :`<button class="del" style="color:var(--muted)" onclick="dropHist('${x.id}')">✕</button>`}
+    </div>`;
+  }).join('');
+}
+function dropHist(id){ setHist(getHist().filter(x=>x.id!==id)); renderHist(); }
+
+/* ================== RÉGLAGES ================== */
+function saveSettings(){
+  const u = $('whUrl').value.trim().replace(/\/$/,'');
+  if(u && !/^https:\/\//.test(u)){ alert('L\'adresse doit commencer par https://'); return; }
+  if(u) localStorage.setItem(LS.url,u); else localStorage.removeItem(LS.url);
+  $('testResult').innerHTML = '<div class="banner ok">Enregistré ✅</div>';
+  refreshSetupBanner();
+}
+async function testWebhook(){
+  saveSettings();
+  $('testResult').innerHTML='<div class="spin"></div>';
+  try{
+    const now=new Date(), to=new Date(now.getTime()+86400000);
+    await api({action:'list', timeMin: now.toISOString(), timeMax: to.toISOString()});
+    $('testResult').innerHTML='<div class="banner ok">🎉 Connexion réussie ! Ton agenda répond.</div>';
+  }catch(err){
+    $('testResult').innerHTML=`<div class="banner err">Échec : ${esc(err.message)}.<br>Vérifie que le workflow n8n est bien <b>activé</b> (interrupteur vert) et que l'URL est celle de <b>production</b>.</div>`;
+  }
+}
+
+/* ================== INIT ================== */
+refreshSetupBanner();
+</script>
+</body>
+</html>
