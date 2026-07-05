@@ -223,8 +223,8 @@
   <section id="tab-reglages" class="hidden">
     <div class="card">
       <h3>⚙️ Connexion à ton agenda</h3>
-      <label>Adresse du webhook n8n (URL de production)</label>
-      <input id="whUrl" type="url" placeholder="https://ton-espace.app.n8n.cloud/webhook/memo-agenda">
+      <label>Adresse du webhook (déjà pré-réglée, n'y touche pas sauf si Claude te le dit)</label>
+      <input id="whUrl" type="url" placeholder="https://hook.eu1.make.com/…">
       <div class="btnrow">
         <button class="btn primary" onclick="saveSettings()">Enregistrer</button>
         <button class="btn ghost" onclick="testWebhook()">Tester</button>
@@ -250,6 +250,9 @@
 <script>
 /* ================== ÉTAT GLOBAL ================== */
 const LS = { url:'mva_webhook', hist:'mva_history' };
+// Webhook Make de Thibaut — pré-configuré, modifiable dans Réglages si besoin.
+const DEFAULT_URL = 'https://hook.eu1.make.com/g2pduyrq8kmbf2hickddd1nrmrrdjxo5';
+const hookUrl = () => localStorage.getItem(LS.url) || DEFAULT_URL;
 let pending = null;      // événement en cours de validation {title,start,end,transcript}
 let dayEventsCache = {}; // clé YYYY-MM => events[]
 let calCur = new Date(); calCur.setDate(1);
@@ -270,22 +273,30 @@ function getHist(){ try{return JSON.parse(localStorage.getItem(LS.hist)||'[]');}
 function setHist(h){ localStorage.setItem(LS.hist, JSON.stringify(h)); }
 
 async function api(body){
-  const url = localStorage.getItem(LS.url);
-  if(!url) throw new Error('NO_URL');
-  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  // Envoi en formulaire simple (pas de pré-vol CORS) — compatible webhook Make.
+  const r = await fetch(hookUrl(), {method:'POST', body: new URLSearchParams(body)});
   if(!r.ok) throw new Error('HTTP '+r.status);
   const txt = await r.text();
-  try{ return JSON.parse(txt); }catch(e){ return txt; }
+  if(txt.trim()==='Accepted') return {events:[]}; // réponse Make par défaut = aucun résultat
+  try{ return JSON.parse(txt); }catch(e){ return {}; }
+}
+function evtDateVal(v){ // accepte "2026-07-05T19:00:00Z" (Make) OU {dateTime|date} (Google brut)
+  if(!v) return null;
+  if(typeof v === 'object') return v.dateTime || v.date;
+  return v;
 }
 function normEvents(res){
-  const arr = Array.isArray(res)? res : [res];
-  return arr.filter(e => e && e.id && e.status!=='cancelled').map(e => ({
-    id: e.id,
-    title: e.summary || '(sans titre)',
-    allDay: !!(e.start && e.start.date),
-    start: new Date(e.start && (e.start.dateTime || e.start.date)),
-    end:   new Date(e.end   && (e.end.dateTime   || e.end.date))
-  }));
+  const arr = Array.isArray(res) ? res : (res && Array.isArray(res.events) ? res.events : []);
+  return arr.filter(e => e && e.id && e.status!=='cancelled').map(e => {
+    const s = evtDateVal(e.start), en = evtDateVal(e.end);
+    return {
+      id: e.id,
+      title: e.summary || e.title || '(sans titre)',
+      allDay: !!(s && !String(s).includes('T')),
+      start: new Date(s),
+      end:   new Date(en || s)
+    };
+  });
 }
 async function listRange(from, to){
   const res = await api({action:'list', timeMin: from.toISOString(), timeMax: to.toISOString()});
@@ -300,11 +311,11 @@ function showTab(t){
   });
   if(t==='calendrier') renderCal(true);
   if(t==='historique') renderHist();
-  if(t==='reglages') $('whUrl').value = localStorage.getItem(LS.url)||'';
+  if(t==='reglages') $('whUrl').value = hookUrl();
   if(t==='parler') refreshSetupBanner();
 }
 function refreshSetupBanner(){
-  $('setupBanner').classList.toggle('hidden', !!localStorage.getItem(LS.url));
+  $('setupBanner').classList.toggle('hidden', !!hookUrl());
 }
 function showState(st){
   ['stIdle','stManual','stReview','stChecking','stBlocked','stWarn','stSaved'].forEach(x=>$(x).classList.add('hidden'));
@@ -481,7 +492,7 @@ async function validateAndCheck(){
   const title = $('fTitle').value.trim();
   const dv = $('fDate').value, tv = $('fTime').value;
   if(!title || !dv || !tv){ alert('Il me faut un titre, une date et une heure !'); return; }
-  if(!localStorage.getItem(LS.url)){ showTab('reglages'); return; }
+  if(!hookUrl()){ showTab('reglages'); return; }
   const [Y,Mo,D] = dv.split('-').map(Number);
   const [H,Mi]   = tv.split(':').map(Number);
   const start = new Date(Y,Mo-1,D,H,Mi);
@@ -492,8 +503,13 @@ async function validateAndCheck(){
   try{
     const d0=new Date(Y,Mo-1,D,0,0,0), d1=new Date(Y,Mo-1,D,23,59,59);
     const evts = await listRange(d0,d1);
-    const overlap = evts.filter(e => !e.allDay && e.start < end && e.end > start);
-    const sameDay = evts.filter(e => !overlap.includes(e));
+    // Les événements "longue durée" (objectifs, projets sur plusieurs jours) ne doivent
+    // pas bloquer un créneau : <=20h = vrai rendez-vous ; 20-36h = journée entière (averti) ; >36h = ignoré.
+    const durH = e => (e.end - e.start)/3600000;
+    const rdv = evts.filter(e => !e.allDay && durH(e) <= 20);
+    const journee = evts.filter(e => !rdv.includes(e) && durH(e) <= 36);
+    const overlap = rdv.filter(e => e.start < end && e.end > start);
+    const sameDay = rdv.filter(e => !overlap.includes(e)).concat(journee);
     if(overlap.length){
       $('blockedList').innerHTML = overlap.map(e=>evtHTML(e,false)).join('');
       showState('stBlocked');
@@ -519,7 +535,7 @@ async function saveEvent(){
       end:   isoLocal(pending.end),
       notes: '🎙️ Dicté le '+new Date().toLocaleDateString('fr-FR')+(pending.transcript? ' — « '+pending.transcript+' »':'')
     });
-    const created = (Array.isArray(res)?res[0]:res) || {};
+    const created = (res && res.id) ? res : ((Array.isArray(res)?res[0]:res) || {});
     const h = getHist();
     h.unshift({
       id: 'h'+Date.now(),
@@ -557,8 +573,11 @@ async function deleteEvt(eventId, btn){
     dayEventsCache = {};
     renderCal(true); renderHist();
   }catch(err){
-    alert('Suppression impossible : '+err.message);
-    if(btn) btn.textContent='🗑';
+    if(confirm('Suppression impossible côté Google (peut-être déjà supprimé là-bas ?).\nRetirer quand même de l\'app ?')){
+      const h = getHist().filter(x=>x.eventId!==eventId); setHist(h);
+      dayEventsCache = {};
+      renderCal(true); renderHist();
+    } else if(btn) btn.textContent='🗑';
   }
 }
 
@@ -571,7 +590,7 @@ async function renderCal(force){
   $('calDow').innerHTML = ['L','M','M','J','V','S','D'].map(x=>`<div class="dow">${x}</div>`).join('');
   const key = calKey(calCur);
   let evts = dayEventsCache[key];
-  if(!evts && localStorage.getItem(LS.url)){
+  if(!evts && hookUrl()){
     $('calLoading').classList.remove('hidden');
     try{
       const from = new Date(calCur.getFullYear(), calCur.getMonth()-0, 1); from.setDate(from.getDate()-7);
